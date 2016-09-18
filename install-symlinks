@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 #see LICENSE for license
 
-cd ../ && ln -s rocc-template sha3
-mv Makefrag Makefrag.old && ln -s sha3/config/Makefrag Makefrag
-cd riscv-tools/riscv-isa-sim && ln -s ../../sha3/isa-sim/sha3 sha3
-mv configure.ac configure.ac.old && ln -s ../../sha3/isa-sim/configure.ac && ln -s ../../sha3/isa-sim/riscv-sha3.pc.in riscv-sha3.pc.in
-cd ../../src/main/scala && ln -s ../../../sha3/config/PrivateConfigs.scala PrivateConfigs.scala
+# hawajkm: Fixing this script to be repeatable. Currently, ran twice, this would break and cause an exist code greater than zero; thus, effectively cause the Makefile target to fail.
+
+#cd ../ && ln -s rocc-template sha3
+#mv Makefrag Makefrag.old && ln -s sha3/config/Makefrag Makefrag
+#cd riscv-tools/riscv-isa-sim && ln -s ../../sha3/isa-sim/sha3 sha3
+#mv configure.ac configure.ac.old && ln -s ../../sha3/isa-sim/configure.ac && ln -s ../../sha3/isa-sim/riscv-sha3.pc.in riscv-sha3.pc.in
+#cd ../../src/main/scala && ln -s ../../../sha3/config/PrivateConfigs.scala PrivateConfigs.scala
+
+
+# hawajkm: The following work much like Makefile. Maybe consider using actual Makefiles? The idea is that each line checks for whether the output exists already. If not, the line would continue executing; else, the line will quitely stop executing.
+(stat ../sha3                                    1>/dev/null 2>&1) || \
+    (ln -s $(readlink -f ../rocc-template) ../sha3)
+(stat ../Makefrag.old                            1>/dev/null 2>&1) || \
+    (mv ../Makefrag ../Makefrag.old && ln -s $(readlink -f ../sha3/config/Makefrag) ../Makefrag)
+(stat ../riscv-tools/riscv-isa-sim/sha3             1>/dev/null 2>&1) || \
+    (ln -s $(readlink -f ../sha3/isa-sim/sha3) ../riscv-tools/riscv-isa-sim/sha3)
+(stat ../riscv-tools/riscv-isa-sim/configure.ac.old 1>/dev/null 2>&1) || \
+    (mv ../riscv-tools/riscv-isa-sim/configure.ac ../riscv-tools/riscv-isa-sim/configure.ac.old && ln -s $(readlink -f ../sha3/isa-sim/configure.ac) ../riscv-tools/riscv-isa-sim/configure.ac && ln -s $(readlink -f ../sha3/isa-sim/riscv-sha3.pc.in) ../riscv-tools/riscv-isa-sim/riscv-sha3.pc.in)
+(stat ../src/main/scala/PrivateConfigs.scala 1>/dev/null 2>&1) || \
+    (ln -s $(readlink -f ../sha3/config/PrivateConfigs.scala) ../src/main/scala/PrivateConfigs.scala)
